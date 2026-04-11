@@ -5,7 +5,7 @@ A data visualization project built for DS 4200. Five visualizations, three stati
 BARTHAG, ADJOE, ADJDE, WAB, and shooting metrics relate to NCAA Tournament outcomes
 across 3,885 team-seasons from 2013–2024.
 
-**Live site:** `https://<your-github-username>.github.io/<repo-name>/`
+**Live site:** `https://ytpatel3.github.io/cbb-analytics/`
 
 ---
 
