@@ -8,8 +8,8 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
-        rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap"
+      rel="stylesheet" />
 
   <!-- Site stylesheet -->
   <link rel="stylesheet" href="css/style.css" />
@@ -21,6 +21,56 @@
   <script src="https://cdn.jsdelivr.net/npm/vega@5/build/vega.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5/build/vega-lite.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6/build/vega-embed.min.js"></script>
+
+  <style>
+    h1, h2, h3, h4 {
+      font-family: var(--display);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+    h3 {
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .nav-brand {
+      font-family: var(--display);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .section-label {
+      font-family: var(--mono);
+    }
+
+    .hero h1 {
+      font-family: var(--display);
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .hero-meta-item strong {
+      font-family: var(--mono);
+    }
+
+    .viz-number {
+      font-family: var(--mono);
+    }
+
+    .future-title {
+      font-family: var(--display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+      border-left: 4px solid var(--accent);
+      padding-left: 0.6rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+  
 </head>
 
 <body>
@@ -45,7 +95,7 @@
   <!-- ── Hero ─────────────────────────────────────────────────────────────── -->
   <header class="hero">
     <div class="container">
-      <span class="section-label">CS 4460 / Data Visualization</span>
+      <span class="section-label">DS 4200 Final Project</span>
       <h1>The Impact of Advanced Efficiency Metrics<br>on NCAA Division I Basketball Success</h1>
       <p class="hero-subtitle">
         Examining how adjusted offensive and defensive efficiency, power rating,
@@ -80,8 +130,8 @@
       <h2>Why Advanced Metrics?</h2>
       <hr class="divider" />
       <p>
-        College basketball analytics has increasingly shifted from traditional statistics —
-        win-loss records and raw scoring margins — toward advanced efficiency-based metrics
+        College basketball analytics has increasingly shifted from traditional statistics like
+        win-loss records and raw scoring margins toward advanced efficiency-based metrics
         that more accurately reflect team quality and predict competitive outcomes.
         This project analyzes NCAA Division I basketball team performance using a dataset
         compiled from Kaggle and originally sourced from analyst Bart Torvik's analytics database,
@@ -93,7 +143,7 @@
         shooting efficiency meaningfully predict postseason success in the NCAA Tournament?</strong>
         This matters because modern program evaluation, bracketology, and strategic decision-making
         increasingly depend on deeper analytics. College basketball also offers an analytically
-        rich environment — over 350 Division I teams, significant tactical diversity across
+        rich environment: over 350 Division I teams, significant tactical diversity across
         conferences, and a high-variance single-elimination postseason that makes identifying
         true quality difficult with surface-level statistics alone.
       </p>
@@ -115,9 +165,9 @@
       <h2>Dataset Overview</h2>
       <hr class="divider" />
       <p>
-        The dataset is the
+        The dataset is from Kaggle titled the 
         <a href="https://www.kaggle.com/datasets/andrewsundberg/college-basketball-dataset?select=cbb.csv"
-           target="_blank" rel="noopener">Kaggle College Basketball Dataset</a>,
+           target="_blank" rel="noopener">College Basketball Dataset</a>,
         which compiles advanced NCAA Division I statistics originally scraped from
         Bart Torvik's analytics website. It covers the 2013–2019 and 2021–2024 seasons
         (the 2020 tournament was canceled due to COVID-19), contains
@@ -134,14 +184,14 @@
       <div class="attr-grid">
         <div class="attr-item"><div class="attr-name">ADJOE</div><div class="attr-desc">Adjusted offensive efficiency (points per 100 possessions, opponent-adjusted)</div></div>
         <div class="attr-item"><div class="attr-name">ADJDE</div><div class="attr-desc">Adjusted defensive efficiency (points allowed per 100 possessions, opponent-adjusted)</div></div>
-        <div class="attr-item"><div class="attr-name">BARTHAG</div><div class="attr-desc">Power rating — probability of beating an average Division I team on a neutral court</div></div>
+        <div class="attr-item"><div class="attr-name">BARTHAG</div><div class="attr-desc">Power rating: probability of beating an average Division I team on a neutral court</div></div>
         <div class="attr-item"><div class="attr-name">EFG_O / EFG_D</div><div class="attr-desc">Effective field goal percentage, offensive and defensive</div></div>
         <div class="attr-item"><div class="attr-name">TOR / TORD</div><div class="attr-desc">Turnover rate allowed and forced (per 100 possessions)</div></div>
         <div class="attr-item"><div class="attr-name">ORB / DRB</div><div class="attr-desc">Offensive and defensive rebound rates</div></div>
-        <div class="attr-item"><div class="attr-name">FTR / FTRD</div><div class="attr-desc">Free throw rate — free throw attempts relative to field goal attempts</div></div>
+        <div class="attr-item"><div class="attr-name">FTR / FTRD</div><div class="attr-desc">Free throw rate: free throw attempts relative to field goal attempts</div></div>
         <div class="attr-item"><div class="attr-name">2P_O / 3P_O</div><div class="attr-desc">Two-point and three-point field goal percentages, offensive</div></div>
-        <div class="attr-item"><div class="attr-name">ADJ_T</div><div class="attr-desc">Adjusted tempo — possessions per 40 minutes, pace-adjusted</div></div>
-        <div class="attr-item"><div class="attr-name">WAB</div><div class="attr-desc">Wins Above Bubble — wins relative to what a bubble team would achieve on the same schedule</div></div>
+        <div class="attr-item"><div class="attr-name">ADJ_T</div><div class="attr-desc">Adjusted tempo: possessions per 40 minutes, pace-adjusted</div></div>
+        <div class="attr-item"><div class="attr-name">WAB</div><div class="attr-desc">Wins Above Bubble: wins relative to what a bubble team would achieve on the same schedule</div></div>
         <div class="attr-item"><div class="attr-name">POSTSEASON</div><div class="attr-desc">Tournament round reached: R68, R64, R32, S16, E8, F4, 2ND, Champions</div></div>
         <div class="attr-item"><div class="attr-name">SEED</div><div class="attr-desc">NCAA Tournament seed (1–16); blank for non-tournament teams</div></div>
       </div>
@@ -169,17 +219,17 @@
           </a>
         </li>
         <li>
-          <div class="ref-title">Predictive Metrics for College Basketball Outcomes</div>
-          <div class="ref-author">Ken Pomeroy (2012). <em>kenpom.com.</em></div>
+          <div class="ref-title">Predicting the Unpredictable: Predicting the March Madness Champion Using Statistical Modeling</div>
+          <div class="ref-author">Jack Sweeney (2025). <em>Bryant University.</em></div>
           <p style="font-size:0.88rem;margin-top:0.4rem;margin-bottom:0;color:var(--muted)">
-            Introduces efficiency-based evaluation methods — adjusted points per possession normalized for
-            opponent strength — that directly underpin ADJOE and ADJDE. This work established the theoretical
+            Introduces efficiency-based evaluation methods, adjusted points per possession normalized for
+            opponent strength, that directly underpin ADJOE and ADJDE. This work established the theoretical
             foundation for modern college basketball analytics and informs how we interpret the efficiency
             scatter in Visualization 4.
           </p>
-          <a href="https://kenpom.com/blog/national-rankings/" target="_blank" rel="noopener"
+          <a href="https://digitalcommons.bryant.edu/cgi/viewcontent.cgi?article=1010&context=honors_cis" target="_blank" rel="noopener"
              style="font-size:0.84rem;">
-            kenpom.com &rarr;
+            digitalcommons.bryant.edu &rarr;
           </a>
         </li>
       </ul>
@@ -200,8 +250,8 @@
       <p>
         Before examining whether advanced metrics predict individual team success, it is
         useful to understand how power ratings are distributed at the conference level.
-        BARTHAG — interpreted as the probability that a team would defeat an average Division I
-        opponent on a neutral court — provides a single composite measure of team strength.
+        BARTHAG, the probability that a team would defeat an average Division I
+        opponent on a neutral court, provides a single composite measure of team strength.
         The box plot below shows the spread of BARTHAG across the seven major conferences,
         ordered by median value, for all team-seasons from 2013 to 2024.
       </p>
@@ -240,8 +290,8 @@
       <p>
         If advanced metrics capture what makes a team elite, we should expect NCAA champions and
         runners-up to show distinct profiles across multiple dimensions. The radar charts below
-        display six key metrics — effective field goal percentage, turnover rate, offensive rebound
-        rate, free throw rate, adjusted defensive efficiency, and adjusted offensive efficiency —
+        display six key metrics, effective field goal percentage, turnover rate, offensive rebound
+        rate, free throw rate, adjusted defensive efficiency, and adjusted offensive efficiency,
         expressed as dataset-wide percentiles, so each axis represents where a team ranks relative
         to all 3,885 team-seasons. Metrics where lower raw values are better (turnover rate,
         defensive efficiency) are inverted so that higher on every axis always means better performance.
@@ -254,8 +304,8 @@
         <div class="viz-caption">
           <h4>Takeaway</h4>
           <p>
-            Champions and runners-up share broadly similar profiles — both groups sit well above the
-            dataset median on every metric — but champions show a consistently higher median on adjusted
+            Champions and runners-up share broadly similar profiles: both groups sit well above the
+            dataset median on every metric, but champions show a consistently higher median on adjusted
             offensive efficiency and effective field goal percentage. The most revealing difference is
             defensive efficiency: champion teams cluster more tightly at the top of that axis, suggesting
             that elite, consistent defense is a stronger differentiator between the two finalist groups
@@ -281,11 +331,11 @@
       <hr class="divider" />
       <p>
         Wins Above Bubble (WAB) measures how many more wins a team accumulated than a hypothetical
-        bubble team would have facing the same schedule — making it a schedule-adjusted indicator
+        bubble team would have facing the same schedule, making it a schedule-adjusted indicator
         of how definitively a team established its tournament worthiness. The three scatter plots
         below compare WAB against adjusted offensive efficiency, two-point field goal percentage,
         and three-point field goal percentage. Points are colored by grouped tournament outcome,
-        and each panel includes an OLS trend line with the Pearson correlation coefficient.
+        and each panel includes a line of best fit (OLS) with the Pearson correlation coefficient (r).
       </p>
 
       <div class="viz-chart-wrap">
@@ -298,7 +348,7 @@
             three metrics shown, confirming that pace- and opponent-adjusted scoring efficiency is a more
             reliable driver of schedule-adjusted win accumulation than raw shooting percentages.
             Two-point percentage shows a moderate positive relationship, while three-point percentage
-            has a weaker, noisier correlation with WAB — consistent with the well-documented high variance
+            has a weaker, noisier correlation with WAB. This is consistent with the well-documented high variance
             of three-point shooting at the team level. Across all three panels, teams reaching the Elite
             Eight or beyond (amber and gold points) cluster in the upper-right, while non-tournament teams
             concentrate in the lower-left, reinforcing that WAB and offensive efficiency jointly discriminate
@@ -322,8 +372,8 @@
       <hr class="divider" />
       <p>
         Plotting adjusted offensive efficiency (ADJOE) on the horizontal axis against adjusted
-        defensive efficiency (ADJDE) on the vertical axis — with the vertical axis inverted so
-        that "up" always means better defense — creates a two-dimensional efficiency space.
+        defensive efficiency (ADJDE) on the vertical axis (with the vertical axis inverted so
+        that "up" always means better defense) creates a two-dimensional efficiency space.
         The upper-right quadrant contains teams with elite offense <em>and</em> elite defense;
         these are the programs most likely to make deep tournament runs. Point size encodes
         BARTHAG, so the largest circles represent the highest-rated teams. Color encodes the
@@ -351,7 +401,7 @@
         <h4>Takeaway</h4>
         <p>
           Championship and Final Four teams occupy a clearly defined upper-right region of
-          efficiency space — high ADJOE combined with low ADJDE — and this separation becomes
+          efficiency space (high ADJOE combined with low ADJDE) and this separation becomes
           visually obvious when the legend is used to isolate deep tournament runs. Non-tournament
           teams, by contrast, scatter broadly and occupy the lower-left quadrant. The interactive
           season filter reveals year-to-year variation: some seasons produce a denser cluster of
@@ -379,7 +429,7 @@
         This chart tests whether that difference translates systematically into better tournament
         outcomes. All 3,885 team-seasons are divided into five equal-count quintile tiers based
         on a selected efficiency metric (BARTHAG, ADJOE, or ADJDE), and for each tier the full
-        postseason distribution — what percentage of teams in that tier reached each round — is
+        postseason distribution, what percentage of teams in that tier reached each round, is
         shown as a stacked bar. If advanced metrics are genuinely predictive, Tier 5 should be
         dominated by tournament teams and deep runs, while Tier 1 should be almost entirely
         non-tournament programs.
@@ -414,7 +464,7 @@
           strength above a threshold is a more reliable predictor of reaching the Final Four and
           beyond than offensive output at the same tier level. Together, these patterns provide
           strong evidence that advanced efficiency metrics are meaningfully predictive of postseason
-          outcomes — not merely correlated with them.
+          outcomes.
         </p>
       </div>
     </div>
@@ -429,9 +479,8 @@
       <h2>What the Data Shows</h2>
       <hr class="divider" />
       <p>
-        Across five visualizations, a consistent and analytically coherent picture emerges.
-        Advanced efficiency metrics — particularly the composite power rating BARTHAG and adjusted
-        defensive efficiency ADJDE — are strong systematic predictors of NCAA Tournament depth.
+        Across five visualizations, advanced efficiency metrics, particularly the composite power rating BARTHAG and adjusted
+        defensive efficiency ADJDE, are strong systematic predictors of NCAA Tournament depth.
         Three specific, actionable conclusions follow from this analysis.
       </p>
 
@@ -454,7 +503,7 @@
             The multi-faceted scatter in Viz 3 demonstrates that three-point percentage has a
             noticeably weaker and noisier relationship with WAB than adjusted offensive efficiency does.
             Recruiting strategies or in-season adjustments that prioritize shot quality and offensive
-            system efficiency — captured by ADJOE — over raw three-point volume are better aligned with
+            system efficiency, captured by ADJOE, over raw three-point volume are better aligned with
             what actually predicts postseason success.
           </p>
         </div>
@@ -472,15 +521,15 @@
       </div>
 
       <hr class="divider" />
-      <h3 style="color:var(--muted);font-family:var(--sans);font-size:0.85rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.8rem;">
+      <h3 class="future-title">
         Future Directions
       </h3>
       <p style="color:var(--muted);font-size:0.92rem;">
         Several extensions would strengthen these findings. First, incorporating game-level data
         rather than season averages would allow analysis of whether teams that peak late (improving
         ADJOE/ADJDE in conference tournament play) outperform their season-average tier in the NCAA
-        Tournament. Second, conference-level adjustment — comparing how a team's metrics compare
-        within their own conference, not just across the full dataset — could improve predictions
+        Tournament. Second, conference-level adjustment, comparing how a team's metrics compare
+        within their own conference, not just across the full dataset, could improve predictions
         for mid-major programs that dominate weak conferences. Third, this analysis covers team-level
         aggregates; player-level efficiency metrics (usage rate, true shooting percentage) would
         allow examination of whether individual star quality provides tournament upside beyond what
@@ -493,10 +542,9 @@
   <footer>
     <div class="container">
       <p>
-        Data: <a href="https://www.kaggle.com/datasets/andrewsundberg/college-basketball-dataset"
-                 target="_blank" rel="noopener">Kaggle — College Basketball Dataset</a>
+        Kaggle Data: <a href="https://www.kaggle.com/datasets/andrewsundberg/college-basketball-dataset"
+                 target="_blank" rel="noopener">College Basketball Dataset</a>
         (originally from <a href="https://barttorvik.com" target="_blank" rel="noopener">barttorvik.com</a>).
-        Built with D3.js v7 and Altair / Vega-Lite.
       </p>
     </div>
   </footer>
