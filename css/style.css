@@ -1,0 +1,331 @@
+/* ============================================================
+   NCAA Basketball Analytics — style.css
+   Dark editorial theme with amber accent
+   Fonts: DM Serif Display (headings) + IBM Plex Sans (body)
+   ============================================================ */
+
+/* ── Tokens ─────────────────────────────────────────────────── */
+:root {
+  --bg:      #0c1420;
+  --card:    #111d2e;
+  --border:  #1e3050;
+  --accent:  #d4890a;
+  --accent2: #f0c040;
+  --text:    #dce3ee;
+  --muted:   #7a90aa;
+  --serif:   "DM Serif Display", Georgia, serif;
+  --sans:    "IBM Plex Sans", system-ui, sans-serif;
+}
+
+/* ── Reset ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+a            { color: var(--accent); text-decoration: none; }
+a:hover      { color: var(--accent2); text-decoration: underline; }
+img          { max-width: 100%; height: auto; display: block; }
+p            { margin-bottom: 1rem; }
+ul           { padding-left: 1.5rem; }
+li           { margin-bottom: 0.35rem; }
+
+/* ── Typography ─────────────────────────────────────────────── */
+h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; line-height: 1.2; }
+
+h1 { font-size: clamp(2rem, 5vw, 3.2rem); color: var(--text); }
+h2 { font-size: clamp(1.4rem, 3vw, 2rem);   color: var(--text); }
+h3 { font-size: 1.15rem; color: var(--accent); letter-spacing: 0.04em; }
+
+.section-label {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* ── Layout ─────────────────────────────────────────────────── */
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+section {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+section:last-of-type { border-bottom: none; }
+
+/* ── Navigation ─────────────────────────────────────────────── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(12, 20, 32, 0.94);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0.75rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.nav-brand {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  color: var(--text);
+  white-space: nowrap;
+}
+.nav-links {
+  display: flex;
+  gap: 1.6rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+}
+.nav-links a {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color 0.18s;
+}
+.nav-links a:hover { color: var(--accent); text-decoration: none; }
+
+/* ── Hero / Header ───────────────────────────────────────────── */
+.hero {
+  padding: 6rem 0 5rem;
+  border-bottom: 1px solid var(--border);
+}
+.hero-subtitle {
+  font-size: 1.05rem;
+  color: var(--muted);
+  max-width: 640px;
+  margin-top: 1.1rem;
+}
+.hero-meta {
+  display: flex;
+  gap: 1.8rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+.hero-meta-item {
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.hero-meta-item strong {
+  display: block;
+  color: var(--text);
+  font-size: 0.95rem;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+}
+
+/* ── Divider ─────────────────────────────────────────────────── */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5rem 0;
+}
+
+/* ── Card ────────────────────────────────────────────────────── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 2rem;
+}
+
+/* ── Data attributes table ────────────────────────────────────── */
+.attr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.4rem;
+}
+.attr-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.7rem 1rem;
+}
+.attr-name {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.82rem;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+.attr-desc {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* ── References ─────────────────────────────────────────────── */
+.ref-list { list-style: none; padding: 0; }
+.ref-list li {
+  padding: 1rem 1.2rem;
+  border-left: 3px solid var(--accent);
+  background: var(--card);
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 1rem;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.ref-list .ref-title  { font-weight: 600; color: var(--text); }
+.ref-list .ref-author { color: var(--muted); }
+
+/* ── Viz sections ────────────────────────────────────────────── */
+.viz-section {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.viz-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2rem;
+  margin-bottom: 0.6rem;
+  flex-wrap: wrap;
+}
+.viz-number {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.15rem 0.55rem;
+}
+.viz-chart-wrap {
+  margin: 2.2rem 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.viz-chart-wrap img {
+  width: 100%;
+  border-radius: 10px;
+}
+.viz-caption {
+  padding: 1.4rem 1.8rem;
+  border-top: 1px solid var(--border);
+  background: rgba(30, 48, 80, 0.18);
+}
+.viz-caption h4 {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+.viz-caption p {
+  font-size: 0.92rem;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.7;
+}
+
+/* Interactive chart containers */
+.viz-interactive-wrap {
+  margin: 2.2rem 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 1.6rem;
+}
+.viz-interaction-note {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(212, 137, 10, 0.08);
+  border: 1px solid rgba(212, 137, 10, 0.25);
+  border-radius: 6px;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+.viz-interaction-note strong { color: var(--accent); }
+
+/* Viz 5 controls override */
+#viz5-chart .d3-metric-row { margin-bottom: 1rem; }
+
+/* ── Altair / Vega-Embed overrides ───────────────────────────── */
+.vega-embed { width: 100% !important; }
+.vega-embed canvas,
+.vega-embed svg { max-width: 100% !important; }
+.vega-embed .vega-actions { display: none !important; }
+
+/* ── Summary / Conclusions ───────────────────────────────────── */
+.conclusion-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 1.2rem;
+  margin-top: 2rem;
+}
+.conclusion-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+.conclusion-card .c-number {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 0.6rem;
+  display: block;
+}
+.conclusion-card h4 {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+.conclusion-card p {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.65;
+}
+
+/* ── Footer ──────────────────────────────────────────────────── */
+footer {
+  padding: 2.5rem 0;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .container { padding: 0 1.2rem; }
+  section, .viz-section { padding: 3.5rem 0; }
+  .hero { padding: 4rem 0 3.5rem; }
+  .nav-links { gap: 1rem; }
+}
