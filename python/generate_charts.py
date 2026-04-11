@@ -17,6 +17,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.gridspec import GridSpec
+import matplotlib.patheffects as pe
 
 import seaborn as sns
 import altair as alt
@@ -164,11 +165,16 @@ def viz1_boxplot(df: pd.DataFrame) -> None:
     # Median value annotations
     for i, conf in enumerate(conf_order, start=1):
         med = cdf.loc[cdf["CONF"] == conf, "BARTHAG"].median()
-        ax.text(
+        txt = ax.text(
             i, med + 0.006, f"{med:.3f}",
             ha="center", va="bottom",
             fontsize=8, color=ACCENT, fontweight="bold", zorder=6
         )
+
+        txt.set_path_effects([
+            pe.Stroke(linewidth=2.2, foreground="black"),
+            pe.Normal()
+        ])
 
     ax.set_xticks(range(1, len(conf_order) + 1))
     ax.set_xticklabels(conf_order, fontsize=11, color=TEXT)
@@ -478,7 +484,7 @@ if __name__ == "__main__":
     df = load_data()
     print(f"  Loaded {len(df)} rows\n")
     viz1_boxplot(df)
-    viz2_radar(df)
-    viz3_scatter_facet(df)
-    viz4_altair(df)
+    # viz2_radar(df)
+    # viz3_scatter_facet(df)
+    # viz4_altair(df)
     print("\nDone. All assets written to charts/ and data/\n")
