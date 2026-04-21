@@ -28,15 +28,5 @@ Kaggle: [College Basketball Dataset](https://www.kaggle.com/datasets/andrewsundb
 | 1 | Static | Matplotlib | Box plot: BARTHAG distribution by major conference |
 | 2 | Static | Matplotlib | Radar chart: performance profiles of champions vs. runners-up |
 | 3 | Static | Matplotlib | Multi-faceted scatter: WAB vs. ADJOE, 2P_O, 3P_O |
-| 4 | Interactive | Altair | Efficiency scatter plot: (ADJOE vs. ADJDE) with season dropdown and legend click |
+| 4 | Interactive | Altair | Efficiency scatter plot: (ADJOE vs. ADJDE) with season slider and legend click |
 | 5 | Interactive | D3.js | Stacked bar chart: tournament outcome distribution by efficiency tier, with metric dropdown and click-to-highlight |
-
-### 3 Interaction Functions
-
-| Interaction | Visualization(s) |
-|-------------|-----------------|
-| Hover tooltip | Viz 4, Viz 5 |
-| Dropdown filter | Viz 4 (season), Viz 5 (metric tier) |
-| Click to highlight / isolate | Viz 4 (legend click), Viz 5 (segment click) |
-
----
