@@ -24,14 +24,14 @@
   ];
   const ROUND_COLORS = {
     "No Tournament": "#2d3f55",
-    "R68":           "#445e7a",
-    "R64":           "#5b7ea0",
-    "R32":           "#6096c4",
-    "S16":           "#3cb87a",
-    "E8":            "#d4890a",
-    "F4":            "#e06b1a",
-    "2ND":           "#c03a2b",
-    "Champions":     "#f0c040",
+    "R68":           "#315072",
+    "R64":           "#445e7a",
+    "R32":           "#5b7ea0",
+    "S16":           "#6096c4",
+    "E8":            "#3cb87a",
+    "F4":            "#f0c040",
+    "2ND":           "#ff7a1c",
+    "Champions":     "#e63946",
   };
 
   /* ── Metric options available in the dropdown ───────────────────────────── */
