@@ -194,7 +194,17 @@ def viz1_boxplot(df: pd.DataFrame) -> None:
     print(f"  Viz 1 saved → {out}")
 
 
-# VIZ 2 — Radar: Champions vs. Runners-Up performance profiles
+# VIZ 2 — Radar charts: one PNG per postseason group + one overview PNG
+#
+# Each individual chart shows:
+#   - Gray dashed polygon: full-dataset median (the "average D1 team" baseline)
+#   - Faint colored lines:  individual team-seasons in the group
+#   - Bold colored polygon: group median
+#
+# All metrics are expressed as dataset-wide percentiles (0-1 scale).
+# Metrics where lower is better (TOR, ADJDE) are inverted so higher = better
+# on every axis, making cross-group comparison unambiguous.
+
 def viz2_radar(df: pd.DataFrame) -> None:
     METRICS      = ["EFG_O", "TOR", "ORB", "FTR", "ADJDE", "ADJOE"]
     LOWER_BETTER = {"TOR", "ADJDE"}
@@ -203,103 +213,124 @@ def viz2_radar(df: pd.DataFrame) -> None:
         "Free Throw\nRate", "Def Eff*", "Adj Off\nEff"
     ]
 
-    def scale_to_percentile(series_val, col):
-        """Scale a raw value to [0,1] percentile across the full dataset."""
-        pct = (series_val - df[col].min()) / (df[col].max() - df[col].min())
-        return 1.0 - float(pct) if col in LOWER_BETTER else float(pct)
+    def scale_row(row):
+        out = {}
+        for m in METRICS:
+            pct = (row[m] - df[m].min()) / (df[m].max() - df[m].min())
+            out[m] = 1.0 - float(pct) if m in LOWER_BETTER else float(pct)
+        return out
 
     def build_profiles(group_df):
-        rows = []
-        for _, row in group_df.iterrows():
-            rows.append({m: scale_to_percentile(row[m], m) for m in METRICS})
-        return pd.DataFrame(rows)
+        return pd.DataFrame([scale_row(row) for _, row in group_df.iterrows()])
 
-    champs  = df[df["POSTSEASON"] == "Champions"].copy()
-    runners = df[df["POSTSEASON"] == "2ND"].copy()
-
-    champ_prof  = build_profiles(champs)
-    runner_prof = build_profiles(runners)
+    # Dataset-wide baseline (shown as gray dashed on every chart)
+    overall_scaled = build_profiles(df)
+    baseline = [overall_scaled[m].median() for m in METRICS]
 
     N      = len(METRICS)
     angles = np.linspace(0, 2 * np.pi, N, endpoint=False).tolist()
     angles += angles[:1]
 
     def close(vals):
-        v = list(vals)
-        return v + [v[0]]
+        return list(vals) + [vals[0]]
 
-    fig, axes = plt.subplots(1, 2, figsize=(14, 7), subplot_kw={"polar": True})
-    fig.patch.set_facecolor(BG)
-
-    datasets = [
-        (champ_prof,  "#f0c040", "NCAA Champions",   axes[0]),
-        (runner_prof, "#9ca3af", "Runner-Up Teams",  axes[1]),
-    ]
-
-    for profiles, color, title, ax in datasets:
+    def draw_radar(ax, profiles, color, title, n_teams):
         ax.set_facecolor(CARD)
-
-        # Individual team polygons (faint)
+        # Baseline reference (gray dashed)
+        ax.plot(angles, close(baseline), color="#7a90aa", linewidth=1.4,
+                linestyle="--", alpha=0.65, zorder=2)
+        ax.fill(angles, close(baseline), color="#7a90aa", alpha=0.05, zorder=1)
+        # Individual team lines
         for _, row in profiles.iterrows():
             vals = close([row[m] for m in METRICS])
-            ax.plot(angles, vals, color=color, linewidth=0.7, alpha=0.20)
-            ax.fill(angles, vals, color=color, alpha=0.03)
-
-        # Median polygon (bold)
+            ax.plot(angles, vals, color=color, linewidth=0.7, alpha=0.18, zorder=3)
+            ax.fill(angles, vals, color=color, alpha=0.02, zorder=2)
+        # Group median
         med_vals = close([profiles[m].median() for m in METRICS])
-        ax.plot(angles, med_vals, color=color, linewidth=2.8)
-        ax.fill(angles, med_vals, color=color, alpha=0.22)
+        ax.plot(angles, med_vals, color=color, linewidth=2.8, zorder=4)
+        ax.fill(angles, med_vals, color=color, alpha=0.22, zorder=3)
 
         ax.set_xticks(angles[:-1])
         ax.set_xticklabels(LABELS, fontsize=9.5, color=TEXT)
         ax.set_yticks([0.25, 0.50, 0.75, 1.00])
-        ax.set_yticklabels(
-            ["25th", "50th", "75th", "100th"],
-            fontsize=7.5, color=MUTED
-        )
+        ax.set_yticklabels(["25th", "50th", "75th", "100th"],
+                            fontsize=7.5, color=MUTED)
         ax.set_ylim(0, 1)
         ax.tick_params(colors=MUTED)
         ax.grid(color=GRID_C, linewidth=0.6)
         ax.spines["polar"].set_color(BORDER)
         ax.set_title(title, pad=20, color=TEXT, fontsize=13, fontweight="bold")
         ax.text(
-            0.5, -0.09,
-            f"n = {len(profiles)} team-seasons | bold = group median | faint lines = individual teams",
-            ha="center", transform=ax.transAxes,
-            fontsize=8, color=MUTED
+            0.5, -0.11,
+            f"n = {n_teams} team-seasons  |  bold = group median  |  faint = individual teams  |  dashed gray = D1-wide median",
+            ha="center", transform=ax.transAxes, fontsize=7.5, color=MUTED
         )
 
+    # (postseason value, display title, color, file slug)
+    GROUPS = [
+        ("Champions",     "NCAA Champions",       ROUND_COLORS["Champions"], "champions"),
+        ("2ND",           "Runner-Up (2ND)",      ROUND_COLORS["2ND"],       "2nd"),
+        ("F4",            "Final Four",           ROUND_COLORS["F4"],        "f4"),
+        ("E8",            "Elite Eight",          ROUND_COLORS["E8"],        "e8"),
+        ("S16",           "Sweet 16",             ROUND_COLORS["S16"],       "s16"),
+        ("R32",           "Round of 32",          ROUND_COLORS["R32"],       "r32"),
+        ("No Tournament", "No Tournament",        ROUND_COLORS["No Tournament"], "notournament"),
+    ]
+
+    subtitle = (
+        "Metrics expressed as dataset-wide percentiles  "
+        "(* = inverted: higher always = better  |  dashed gray = D1-wide average)"
+    )
+
+    for ps_val, title, color, slug in GROUPS:
+        group_df = df[df["POSTSEASON"] == ps_val].copy()
+        profiles = build_profiles(group_df)
+        fig, ax  = plt.subplots(figsize=(7, 7), subplot_kw={"polar": True})
+        fig.patch.set_facecolor(BG)
+        draw_radar(ax, profiles, color, title, len(profiles))
+        fig.suptitle(subtitle, fontsize=9.5, color=MUTED, y=1.01)
+        fig.tight_layout()
+        out = os.path.join(CHART_DIR, f"viz2_radar_{slug}.png")
+        fig.savefig(out, dpi=150, bbox_inches="tight", facecolor=BG)
+        plt.close(fig)
+        print(f"    {slug:16s} -> {out}")
+
+    # Side-by-side overview (Champions vs. Runner-Up)
+    fig, axes = plt.subplots(1, 2, figsize=(14, 7), subplot_kw={"polar": True})
+    fig.patch.set_facecolor(BG)
+    for (ps_val, title, color, _), ax in zip(GROUPS[:2], axes):
+        group_df = df[df["POSTSEASON"] == ps_val].copy()
+        profiles = build_profiles(group_df)
+        draw_radar(ax, profiles, color, title, len(profiles))
     fig.suptitle(
-        "Performance Profiles: NCAA Champions vs. Runner-Up Teams\n"
-        "Metrics expressed as dataset-wide percentiles  (* = inverted; higher always = better)",
-        fontsize=12, color=TEXT, y=1.01, fontweight="bold"
+        "Performance Profiles: NCAA Champions vs. Runner-Up Teams\n" + subtitle,
+        fontsize=11, color=TEXT, y=1.01, fontweight="bold"
     )
     fig.tight_layout()
-    out = os.path.join(CHART_DIR, "viz2_radar.png")
+    out = os.path.join(CHART_DIR, "viz2_radar_overview.png")
     fig.savefig(out, dpi=150, bbox_inches="tight", facecolor=BG)
     plt.close(fig)
-    print(f"  Viz 2 saved → {out}")
+    print(f"  Viz 2 overview -> {out}")
 
 
-# VIZ 3 — Multi-faceted scatter: WAB vs. key offensive/efficiency attributes
+# VIZ 3 — Multi-faceted scatter: WAB vs. ADJOE, ADJDE, 2P_O
 def viz3_scatter_facet(df: pd.DataFrame) -> None:
     PANELS = [
         ("WAB", "ADJOE", "Adjusted Offensive Efficiency (ADJOE)"),
+        ("WAB", "ADJDE", "Adjusted Defensive Efficiency (ADJDE)"),
         ("WAB", "2P_O",  "Two-Point Field Goal % (2P_O)"),
-        ("WAB", "3P_O",  "Three-Point Field Goal % (3P_O)"),
     ]
 
-    # Simplified postseason color groups
     def color_group(ps):
-        if str(ps) == "No Tournament": return "#2d3f55"
-        if str(ps) in ("R68", "R64"):  return "#5b7ea0"
-        if str(ps) in ("R32", "S16"):  return "#3cb87a"
-        if str(ps) in ("E8", "F4"):    return "#d4890a"
-        return "#f0c040"  # 2ND / Champions
+        s = str(ps)
+        if s == "No Tournament":     return "#2d3f55"
+        if s in ("R68", "R64"):      return "#4a7ab5"
+        if s in ("R32", "S16"):      return "#3cb87a"
+        if s in ("E8", "F4"):        return "#c8880a"
+        return "#e63946"   # 2ND / Champions
 
-    GROUP_LABELS  = ["No Tournament", "R68/R64", "R32/S16", "E8/F4", "2ND/Champions"]
-    GROUP_COLORS  = ["#2d3f55", "#5b7ea0", "#3cb87a", "#d4890a", "#f0c040"]
-
+    GROUP_LABELS = ["No Tournament", "R68/R64", "R32/S16", "E8/F4", "2ND/Champions"]
+    GROUP_COLORS = ["#2d3f55", "#4a7ab5", "#3cb87a", "#c8880a", "#e63946"]
     colors = df["POSTSEASON"].map(color_group)
 
     fig, axes = plt.subplots(1, 3, figsize=(17, 5.5))
@@ -307,24 +338,18 @@ def viz3_scatter_facet(df: pd.DataFrame) -> None:
 
     for ax, (x_col, y_col, y_label) in zip(axes, PANELS):
         ax.set_facecolor(CARD)
-        ax.scatter(
-            df[x_col], df[y_col],
-            c=colors, s=13, alpha=0.55, linewidths=0, rasterized=True
-        )
+        ax.scatter(df[x_col], df[y_col],
+                   c=colors, s=13, alpha=0.55, linewidths=0, rasterized=True)
 
-        # OLS trend line
         mask = df[[x_col, y_col]].notna().all(axis=1)
-        m, b = np.polyfit(df.loc[mask, x_col], df.loc[mask, y_col], 1)
+        m_coef, b_coef = np.polyfit(df.loc[mask, x_col], df.loc[mask, y_col], 1)
         xs = np.linspace(df[x_col].min(), df[x_col].max(), 300)
-        ax.plot(xs, m * xs + b, color=ACCENT, linewidth=1.8,
-                linestyle="--", alpha=0.9, label="OLS fit")
+        ax.plot(xs, m_coef * xs + b_coef, color=ACCENT, linewidth=1.8,
+                linestyle="--", alpha=0.9)
 
         r = df.loc[mask, [x_col, y_col]].corr().iloc[0, 1]
-        ax.text(
-            0.05, 0.95, f"r = {r:.3f}",
-            transform=ax.transAxes, fontsize=9.5,
-            color=ACCENT, va="top", fontweight="bold"
-        )
+        ax.text(0.05, 0.95, f"r = {r:.3f}", transform=ax.transAxes, fontsize=9.5,
+                color=ACCENT, va="top", fontweight="bold")
 
         ax.set_xlabel("Wins Above Bubble (WAB)", labelpad=6, color=TEXT)
         ax.set_ylabel(y_label, labelpad=6, color=TEXT)
@@ -334,37 +359,35 @@ def viz3_scatter_facet(df: pd.DataFrame) -> None:
         for spine in ax.spines.values():
             spine.set_edgecolor(BORDER)
 
-    # Shared legend
-    patches = [
-        mpatches.Patch(facecolor=c, edgecolor=BORDER, label=g)
-        for g, c in zip(GROUP_LABELS, GROUP_COLORS)
-    ]
-    fig.legend(
-        handles=patches, loc="lower center", ncol=5,
-        frameon=True, fontsize=9,
-        title="Tournament Round Group", title_fontsize=9,
-        bbox_to_anchor=(0.5, -0.06)
-    )
+        if y_col == "ADJDE":
+            ax.text(0.05, 0.06, "<-- lower ADJDE = better defense",
+                    transform=ax.transAxes, fontsize=8,
+                    color=MUTED, va="bottom", style="italic")
 
+    patches = [mpatches.Patch(facecolor=c, edgecolor=BORDER, label=g)
+               for g, c in zip(GROUP_LABELS, GROUP_COLORS)]
+    fig.legend(handles=patches, loc="lower center", ncol=5, frameon=True,
+               fontsize=9, title="Tournament Round Group", title_fontsize=9,
+               bbox_to_anchor=(0.5, -0.06))
     fig.suptitle(
-        "Wins Above Bubble (WAB) vs. Key Offensive & Efficiency Metrics\n"
-        "(All teams, 2013–2024 — colored by tournament outcome)",
+        "Wins Above Bubble (WAB) vs. Offensive Efficiency, Defensive Efficiency, and Two-Point Shooting\n"
+        "(All teams, 2013-2024 -- colored by tournament outcome)",
         fontsize=13, color=TEXT, fontweight="bold", y=1.02
     )
     fig.tight_layout()
     out = os.path.join(CHART_DIR, "viz3_scatter_facet.png")
     fig.savefig(out, dpi=150, bbox_inches="tight", facecolor=BG)
     plt.close(fig)
-    print(f"  Viz 3 saved → {out}")
+    print(f"  Viz 3 saved -> {out}")
 
 
-# VIZ 4 — Altair (interactive): ADJOE vs. ADJDE, colored by postseason round
+# VIZ 4 — Altair interactive: ADJOE vs. ADJDE scatter
 def viz4_altair(df: pd.DataFrame) -> None:
     cols = ["TEAM", "CONF", "YEAR", "ADJOE", "ADJDE", "BARTHAG",
             "POSTSEASON", "SEED", "W", "WAB"]
     plot_df = df[cols].copy()
     plot_df["POSTSEASON"] = plot_df["POSTSEASON"].astype(str)
-    plot_df["YEAR"]       = plot_df["YEAR"].astype(str)
+    plot_df["YEAR"]       = plot_df["YEAR"].astype(int)   # integer required for slider
     plot_df["SEED"]       = plot_df["SEED"].fillna("N/A").astype(str)
     plot_df = plot_df.dropna(subset=["ADJOE", "ADJDE", "BARTHAG"])
 
@@ -373,47 +396,35 @@ def viz4_altair(df: pd.DataFrame) -> None:
         range=[ROUND_COLORS[r] for r in ROUND_ORDER]
     )
 
-    # Year dropdown — 'All' shows every season
-    year_opts = ["All"] + sorted(plot_df["YEAR"].unique().tolist())
-    year_bind = alt.binding_select(options=year_opts, name="Season: ")
-    year_param = alt.param(name="year_sel", bind=year_bind, value="All")
+    # Numeric slider 2013-2024, step 1
+    year_slider  = alt.binding_range(min=2013, max=2024, step=1, name="Season: ")
+    year_param   = alt.param(name="year_sel", bind=year_slider, value=2019)
 
-    # Legend click for postseason filtering
+    # Checkbox overrides slider (defaults to checked = show all)
+    show_all_bind  = alt.binding_checkbox(name="Show all seasons ")
+    show_all_param = alt.param(name="show_all", bind=show_all_bind, value=True)
+
+    # Legend click isolates a postseason round
     legend_sel = alt.selection_point(fields=["POSTSEASON"], bind="legend")
 
     base = (
         alt.Chart(plot_df)
-        .transform_filter(
-            "year_sel === 'All' || datum.YEAR === year_sel"
-        )
+        .transform_filter("show_all || datum.YEAR == year_sel")
     )
 
     scatter = (
         base.mark_circle(stroke=None)
         .encode(
-            x=alt.X(
-                "ADJOE:Q",
-                scale=alt.Scale(zero=False),
-                title="Adjusted Offensive Efficiency (ADJOE)",
-            ),
-            y=alt.Y(
-                "ADJDE:Q",
-                scale=alt.Scale(zero=False, reverse=True),
-                title="Adjusted Defensive Efficiency (ADJDE)  ←  lower is better",
-            ),
+            x=alt.X("ADJOE:Q", scale=alt.Scale(zero=False),
+                    title="Adjusted Offensive Efficiency (ADJOE)"),
+            y=alt.Y("ADJDE:Q", scale=alt.Scale(zero=False, reverse=True),
+                    title="Adjusted Defensive Efficiency (ADJDE)  <--  lower is better"),
             color=alt.Color(
-                "POSTSEASON:N",
-                scale=color_scale,
-                sort=ROUND_ORDER,
-                legend=alt.Legend(
-                    title="Tournament Round",
-                    orient="right",
-                    symbolSize=80,
-                ),
+                "POSTSEASON:N", scale=color_scale, sort=ROUND_ORDER,
+                legend=alt.Legend(title="Tournament Round", orient="right", symbolSize=80),
             ),
             size=alt.Size(
-                "BARTHAG:Q",
-                scale=alt.Scale(range=[18, 200]),
+                "BARTHAG:Q", scale=alt.Scale(range=[18, 200]),
                 legend=alt.Legend(title="BARTHAG (power rating)", orient="right"),
             ),
             opacity=alt.condition(legend_sel, alt.value(0.78), alt.value(0.08)),
@@ -430,7 +441,7 @@ def viz4_altair(df: pd.DataFrame) -> None:
                 alt.Tooltip("W:Q",          title="Wins"),
             ],
         )
-        .add_params(year_param, legend_sel)
+        .add_params(year_param, show_all_param, legend_sel)
         .properties(width=720, height=500)
     )
 
@@ -455,22 +466,20 @@ def viz4_altair(df: pd.DataFrame) -> None:
         labelFontSize=11,
         titleFontSize=11,
         padding=10,
-    ).configure_title(
-        color="#dce3ee",
-    )
+    ).configure_title(color="#dce3ee")
 
     out = os.path.join(CHART_DIR, "viz4_altair.json")
     chart.save(out)
-    print(f"  Viz 4 saved → {out}")
+    print(f"  Viz 4 saved -> {out}")
 
 
 if __name__ == "__main__":
-    print("\n=== NCAA Basketball Analytics — Chart Generator ===\n")
+    print("\n=== NCAA Basketball Analytics -- Chart Generator ===\n")
     set_style()
     df = load_data()
     print(f"  Loaded {len(df)} rows\n")
-    viz1_boxplot(df)
-    # viz2_radar(df)
-    # viz3_scatter_facet(df)
-    # viz4_altair(df)
-    print("\nDone. All assets written to charts/ and data/\n")
+    # viz1_boxplot(df)
+    viz2_radar(df)
+    viz3_scatter_facet(df)
+    viz4_altair(df)
+    print("\nDone.\n")
