@@ -5,72 +5,82 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Advanced Metrics &amp; NCAA Basketball Success</title>
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap"
-      rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet" />
 
-  <!-- Site stylesheet -->
   <link rel="stylesheet" href="css/style.css" />
 
-  <!-- D3 v7 -->
   <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-
-  <!-- Vega + Vega-Lite + Vega-Embed (for Altair chart) -->
   <script src="https://cdn.jsdelivr.net/npm/vega@5/build/vega.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5/build/vega-lite.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6/build/vega-embed.min.js"></script>
 
   <style>
-    h1, h2, h3, h4 {
-      font-family: var(--display);
-      font-weight: 500;
-      letter-spacing: 0.02em;
+    /* ── Radar tab controls ────────────────────────────────────── */
+    .radar-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 1.2rem;
     }
-    h3 {
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .nav-brand {
-      font-family: var(--display);
+    .radar-tab-btn {
+      font-family: var(--sans);
+      font-size: 0.78rem;
       font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .section-label {
-      font-family: var(--mono);
-    }
-
-    .hero h1 {
-      font-family: var(--display);
-      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
       letter-spacing: 0.03em;
     }
-
-    .hero-meta-item strong {
-      font-family: var(--mono);
+    .radar-tab-btn:hover  { border-color: var(--accent); color: var(--accent); }
+    .radar-tab-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .radar-img-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .radar-img-wrap img { width: 100%; display: block; }
+    .radar-group-note {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      font-family: var(--sans);
     }
 
-    .viz-number {
-      font-family: var(--mono);
+    /* ── Color key for round legend ────────────────────────────── */
+    .round-key {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      margin: 1rem 0;
     }
-
-    .future-title {
-      font-family: var(--display);
-      font-size: 1.1rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text);
-      border-left: 4px solid var(--accent);
-      padding-left: 0.6rem;
-      margin-bottom: 1rem;
+    .round-key-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-family: var(--sans);
+    }
+    .round-key-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      flex-shrink: 0;
     }
   </style>
-  
 </head>
 
 <body>
@@ -95,7 +105,7 @@
   <!-- ── Hero ─────────────────────────────────────────────────────────────── -->
   <header class="hero">
     <div class="container">
-      <span class="section-label">DS 4200 Final Project</span>
+      <span class="section-label">CS 4460 / Data Visualization</span>
       <h1>The Impact of Advanced Efficiency Metrics<br>on NCAA Division I Basketball Success</h1>
       <p class="hero-subtitle">
         Examining how adjusted offensive and defensive efficiency, power rating,
@@ -103,22 +113,10 @@
         Tournament seasons (2013–2024).
       </p>
       <div class="hero-meta">
-        <div class="hero-meta-item">
-          <strong>Dataset</strong>
-          Kaggle / Bart Torvik
-        </div>
-        <div class="hero-meta-item">
-          <strong>Coverage</strong>
-          2013–2019, 2021–2024
-        </div>
-        <div class="hero-meta-item">
-          <strong>Teams</strong>
-          3,885 team-seasons
-        </div>
-        <div class="hero-meta-item">
-          <strong>Visualizations</strong>
-          5 (3 static, 2 interactive)
-        </div>
+        <div class="hero-meta-item"><strong>Dataset</strong>Kaggle / Bart Torvik</div>
+        <div class="hero-meta-item"><strong>Coverage</strong>2013–2019, 2021–2024</div>
+        <div class="hero-meta-item"><strong>Teams</strong>3,885 team-seasons</div>
+        <div class="hero-meta-item"><strong>Visualizations</strong>5 (3 static, 2 interactive)</div>
       </div>
     </div>
   </header>
@@ -130,30 +128,34 @@
       <h2>Why Advanced Metrics?</h2>
       <hr class="divider" />
       <p>
-        College basketball analytics has increasingly shifted from traditional statistics like
-        win-loss records and raw scoring margins toward advanced efficiency-based metrics
-        that more accurately reflect team quality and predict competitive outcomes.
-        This project analyzes NCAA Division I basketball team performance using a dataset
-        compiled from Kaggle and originally sourced from analyst Bart Torvik's analytics database,
-        which adjusts for opponent strength and game tempo.
+        College basketball analytics has increasingly shifted from traditional statistics —
+        win-loss records and raw scoring margins — toward advanced efficiency-based metrics
+        that more accurately reflect team quality and predict competitive outcomes. This project
+        analyzes NCAA Division I basketball team performance using a dataset compiled from Kaggle
+        and originally sourced from analyst Bart Torvik's analytics database, which adjusts for
+        opponent strength and game tempo.
       </p>
       <p>
-        The central question is straightforward: <strong>do advanced metrics like adjusted
-        offensive efficiency, adjusted defensive efficiency, power rating (BARTHAG), and
-        shooting efficiency meaningfully predict postseason success in the NCAA Tournament?</strong>
-        This matters because modern program evaluation, bracketology, and strategic decision-making
-        increasingly depend on deeper analytics. College basketball also offers an analytically
-        rich environment: over 350 Division I teams, significant tactical diversity across
-        conferences, and a high-variance single-elimination postseason that makes identifying
-        true quality difficult with surface-level statistics alone.
+        The central question is: <strong>do advanced metrics like adjusted offensive efficiency,
+        adjusted defensive efficiency, power rating (BARTHAG), and shooting efficiency meaningfully
+        predict postseason success in the NCAA Tournament?</strong> This matters because modern
+        program evaluation, bracketology, and strategic decision-making increasingly depend on
+        deeper analytics. College basketball also offers a rich analytical environment — over 350
+        Division I teams, significant tactical diversity across conferences, and a high-variance
+        single-elimination postseason that makes identifying true team quality difficult with
+        surface-level statistics alone.
       </p>
       <p>
-        The five visualizations below progress from a broad conference-level overview through
-        increasingly specific comparisons: how conferences differ in team quality, what
-        separates champions from runners-up, which attributes correlate with wins above the
-        tournament bubble, how teams distribute across efficiency space by postseason result,
-        and finally whether that efficiency advantage translates systematically into deeper
-        tournament runs when teams are binned by tier.
+        The five visualizations below follow a deliberate narrative arc. We begin with a
+        conference-level overview of power ratings to establish the landscape (Viz 1). We then
+        examine multi-metric performance profiles across all postseason groups, comparing how teams
+        at different tournament depths look across both offensive and defensive dimensions (Viz 2).
+        From there, we test which efficiency metrics — both offensive and defensive — correlate most
+        strongly with schedule-adjusted wins, and add one shooting metric for comparison (Viz 3).
+        We then plot the full two-dimensional efficiency space interactively, colored by postseason
+        outcome, to see whether teams cluster meaningfully by result (Viz 4). Finally, we formalize
+        that relationship by binning teams into efficiency tiers and examining what fraction of each
+        tier reaches each round (Viz 5).
       </p>
     </div>
   </section>
@@ -165,35 +167,43 @@
       <h2>Dataset Overview</h2>
       <hr class="divider" />
       <p>
-        The dataset is from Kaggle titled the 
+        The dataset is the
         <a href="https://www.kaggle.com/datasets/andrewsundberg/college-basketball-dataset?select=cbb.csv"
-           target="_blank" rel="noopener">College Basketball Dataset</a>,
-        which compiles advanced NCAA Division I statistics originally scraped from
-        Bart Torvik's analytics website. It covers the 2013–2019 and 2021–2024 seasons
-        (the 2020 tournament was canceled due to COVID-19), contains
-        <strong>3,885 rows</strong> and <strong>24 columns</strong>, where each row
-        represents one team in one season. Variables span basic performance measures,
-        advanced efficiency metrics, shooting statistics, possession-based rates, tempo,
-        and tournament outcomes including postseason round and seed. A mix of continuous
-        numerical variables and categorical variables allows comparison across teams,
-        conferences, and seasons. No imputation was required; non-tournament teams simply
-        have a blank postseason field, which is treated as a distinct "No Tournament" category
-        throughout the analysis.
+           target="_blank" rel="noopener">Kaggle College Basketball Dataset</a>,
+        which compiles advanced NCAA Division I statistics originally scraped from Bart Torvik's
+        analytics website. It covers the 2013–2019 and 2021–2024 seasons (the 2020 tournament was
+        canceled due to COVID-19), contains <strong>3,885 rows</strong> and <strong>24 columns</strong>,
+        where each row represents one team in one season. No imputation was required; non-tournament
+        teams have a blank postseason field, treated throughout as a distinct "No Tournament" category.
       </p>
 
       <div class="attr-grid">
-        <div class="attr-item"><div class="attr-name">ADJOE</div><div class="attr-desc">Adjusted offensive efficiency (points per 100 possessions, opponent-adjusted)</div></div>
-        <div class="attr-item"><div class="attr-name">ADJDE</div><div class="attr-desc">Adjusted defensive efficiency (points allowed per 100 possessions, opponent-adjusted)</div></div>
-        <div class="attr-item"><div class="attr-name">BARTHAG</div><div class="attr-desc">Power rating: probability of beating an average Division I team on a neutral court</div></div>
+        <div class="attr-item"><div class="attr-name">ADJOE</div><div class="attr-desc">Adjusted offensive efficiency — points scored per 100 possessions, opponent-adjusted</div></div>
+        <div class="attr-item"><div class="attr-name">ADJDE</div><div class="attr-desc">Adjusted defensive efficiency — points allowed per 100 possessions, opponent-adjusted</div></div>
+        <div class="attr-item"><div class="attr-name">BARTHAG</div><div class="attr-desc">Power rating — estimated probability of defeating an average Division I team on a neutral court</div></div>
         <div class="attr-item"><div class="attr-name">EFG_O / EFG_D</div><div class="attr-desc">Effective field goal percentage, offensive and defensive</div></div>
-        <div class="attr-item"><div class="attr-name">TOR / TORD</div><div class="attr-desc">Turnover rate allowed and forced (per 100 possessions)</div></div>
+        <div class="attr-item"><div class="attr-name">TOR / TORD</div><div class="attr-desc">Turnover rate — turnovers per 100 possessions, given and forced</div></div>
         <div class="attr-item"><div class="attr-name">ORB / DRB</div><div class="attr-desc">Offensive and defensive rebound rates</div></div>
-        <div class="attr-item"><div class="attr-name">FTR / FTRD</div><div class="attr-desc">Free throw rate: free throw attempts relative to field goal attempts</div></div>
+        <div class="attr-item"><div class="attr-name">FTR / FTRD</div><div class="attr-desc">Free throw rate — free throw attempts relative to field goal attempts</div></div>
         <div class="attr-item"><div class="attr-name">2P_O / 3P_O</div><div class="attr-desc">Two-point and three-point field goal percentages, offensive</div></div>
-        <div class="attr-item"><div class="attr-name">ADJ_T</div><div class="attr-desc">Adjusted tempo: possessions per 40 minutes, pace-adjusted</div></div>
-        <div class="attr-item"><div class="attr-name">WAB</div><div class="attr-desc">Wins Above Bubble: wins relative to what a bubble team would achieve on the same schedule</div></div>
-        <div class="attr-item"><div class="attr-name">POSTSEASON</div><div class="attr-desc">Tournament round reached: R68, R64, R32, S16, E8, F4, 2ND, Champions</div></div>
+        <div class="attr-item"><div class="attr-name">ADJ_T</div><div class="attr-desc">Adjusted tempo — possessions per 40 minutes, pace-adjusted</div></div>
+        <div class="attr-item"><div class="attr-name">WAB</div><div class="attr-desc">Wins Above Bubble — wins beyond what a bubble team would achieve on the same schedule</div></div>
+        <div class="attr-item"><div class="attr-name">POSTSEASON</div><div class="attr-desc">Tournament round: R68, R64, R32, S16, E8, F4, 2ND, Champions, or blank (no tournament)</div></div>
         <div class="attr-item"><div class="attr-name">SEED</div><div class="attr-desc">NCAA Tournament seed (1–16); blank for non-tournament teams</div></div>
+      </div>
+
+      <!-- Shared color key — used across Viz 3, 4, and 5 -->
+      <p style="margin-top:1.6rem;font-size:0.9rem;color:var(--muted);">
+        The color encoding below is consistent across Visualizations 3, 4, and 5:
+      </p>
+      <div class="round-key">
+        <div class="round-key-item"><div class="round-key-swatch" style="background:#2d3f55"></div>No Tournament</div>
+        <div class="round-key-item"><div class="round-key-swatch" style="background:#4a7ab5"></div>R68 / R64</div>
+        <div class="round-key-item"><div class="round-key-swatch" style="background:#3cb87a"></div>R32 / S16</div>
+        <div class="round-key-item"><div class="round-key-swatch" style="background:#c8880a"></div>E8 (Elite Eight)</div>
+        <div class="round-key-item"><div class="round-key-swatch" style="background:#e06b1a"></div>F4 (Final Four)</div>
+        <div class="round-key-item"><div class="round-key-swatch" style="background:#9b2335"></div>2ND (Runner-Up)</div>
+        <div class="round-key-item"><div class="round-key-swatch" style="background:#e63946"></div>Champions</div>
       </div>
     </div>
   </section>
@@ -208,28 +218,26 @@
         <li>
           <div class="ref-title">Seed Distribution and Upset Probabilities in the NCAA Men's Basketball Tournament</div>
           <div class="ref-author">S. H. Jacobson, J. G. King, &amp; E. C. Sewell (2011). <em>Omega: The International Journal of Management Science.</em></div>
-          <p style="font-size:0.88rem;margin-top:0.4rem;margin-bottom:0;color:var(--muted)">
+          <p style="font-size:0.88rem;margin-top:0.4rem;margin-bottom:0.4rem;color:var(--muted)">
             Investigates mathematical upset probabilities based on tournament seeding. Because our dataset
             includes both seed and postseason round, this paper provides a benchmark for evaluating whether
             advanced efficiency metrics outperform committee-assigned seeding as a predictor of tournament success.
           </p>
-          <a href="https://bracketodds.cs.illinois.edu/2011%20Omega.pdf" target="_blank" rel="noopener"
-             style="font-size:0.84rem;">
+          <a href="https://bracketodds.cs.illinois.edu/2011%20Omega.pdf" target="_blank" rel="noopener" style="font-size:0.84rem;">
             bracketodds.cs.illinois.edu &rarr;
           </a>
         </li>
         <li>
-          <div class="ref-title">Predicting the Unpredictable: Predicting the March Madness Champion Using Statistical Modeling</div>
-          <div class="ref-author">Jack Sweeney (2025). <em>Bryant University.</em></div>
-          <p style="font-size:0.88rem;margin-top:0.4rem;margin-bottom:0;color:var(--muted)">
-            Introduces efficiency-based evaluation methods, adjusted points per possession normalized for
-            opponent strength, that directly underpin ADJOE and ADJDE. This work established the theoretical
+          <div class="ref-title">Predictive Metrics for College Basketball Outcomes</div>
+          <div class="ref-author">Ken Pomeroy (2012). <em>kenpom.com.</em></div>
+          <p style="font-size:0.88rem;margin-top:0.4rem;margin-bottom:0.4rem;color:var(--muted)">
+            Introduces efficiency-based evaluation methods — adjusted points per possession normalized for
+            opponent strength — that directly underpin ADJOE and ADJDE. This work established the theoretical
             foundation for modern college basketball analytics and informs how we interpret the efficiency
             scatter in Visualization 4.
           </p>
-          <a href="https://digitalcommons.bryant.edu/cgi/viewcontent.cgi?article=1010&context=honors_cis" target="_blank" rel="noopener"
-             style="font-size:0.84rem;">
-            digitalcommons.bryant.edu &rarr;
+          <a href="https://kenpom.com/blog/national-rankings/" target="_blank" rel="noopener" style="font-size:0.84rem;">
+            kenpom.com &rarr;
           </a>
         </li>
       </ul>
@@ -248,12 +256,12 @@
       <h2>Power Rating Distribution Across Major Conferences</h2>
       <hr class="divider" />
       <p>
-        Before examining whether advanced metrics predict individual team success, it is
-        useful to understand how power ratings are distributed at the conference level.
-        BARTHAG, the probability that a team would defeat an average Division I
-        opponent on a neutral court, provides a single composite measure of team strength.
-        The box plot below shows the spread of BARTHAG across the seven major conferences,
-        ordered by median value, for all team-seasons from 2013 to 2024.
+        Before examining whether advanced metrics predict individual team success, it is useful
+        to understand how power ratings are distributed at the conference level. BARTHAG — the
+        probability that a team would defeat an average Division I opponent on a neutral court —
+        provides a single composite measure of overall team strength. The box plot below shows
+        the spread of BARTHAG across seven major conferences, ordered by median, across all
+        team-seasons from 2013 to 2024.
       </p>
 
       <div class="viz-chart-wrap">
@@ -262,14 +270,14 @@
         <div class="viz-caption">
           <h4>Takeaway</h4>
           <p>
-            The Big Ten (B10) and Big 12 (B12) consistently produce the highest median BARTHAG values,
-            followed closely by the ACC and SEC. The Atlantic 10 (A10) shows substantially lower median
-            power ratings, reflecting the gap between power-conference and mid-major programs even among
-            the seven conferences considered "major." Importantly, every conference exhibits wide internal
-            variance: the top quartile of ACC or SEC teams can match or exceed the median of any other
-            conference, while the bottom quartile drags the distribution downward. This variance within
-            conferences is what makes BARTHAG a more informative metric than conference membership alone
-            when predicting tournament outcomes.
+            The Big Ten and Big 12 consistently produce the highest median BARTHAG values, followed
+            closely by the ACC and SEC. The Atlantic 10 shows substantially lower median power ratings,
+            reflecting the gap between power-conference and mid-major programs even among conferences
+            considered "major." Critically, every conference exhibits wide internal variance: the top
+            quartile of ACC or SEC teams can match or exceed the median of any other conference, while
+            the bottom quartile pulls the distribution down considerably. This within-conference variance
+            is what makes BARTHAG a more informative metric than conference membership alone when
+            predicting tournament outcomes.
           </p>
         </div>
       </div>
@@ -277,7 +285,7 @@
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       VIZ 2 — Radar: Champions vs. Runners-Up
+       VIZ 2 — Radar: Performance profiles by postseason group
   ══════════════════════════════════════════════════════════════════════════ -->
   <section class="viz-section" id="viz2">
     <div class="container">
@@ -285,41 +293,98 @@
         <span class="viz-number">VIZ 02</span>
         <span class="section-label" style="margin:0">Static · Python / Matplotlib</span>
       </div>
-      <h2>Performance Profiles: Champions vs. Runner-Up Teams</h2>
+      <h2>Performance Profiles by Postseason Group</h2>
       <hr class="divider" />
       <p>
-        If advanced metrics capture what makes a team elite, we should expect NCAA champions and
-        runners-up to show distinct profiles across multiple dimensions. The radar charts below
-        display six key metrics, effective field goal percentage, turnover rate, offensive rebound
-        rate, free throw rate, adjusted defensive efficiency, and adjusted offensive efficiency,
-        expressed as dataset-wide percentiles, so each axis represents where a team ranks relative
-        to all 3,885 team-seasons. Metrics where lower raw values are better (turnover rate,
-        defensive efficiency) are inverted so that higher on every axis always means better performance.
-        The bold polygon is the group median; faint lines represent individual team-seasons.
+        If advanced metrics capture what makes a team elite, we should expect teams at different
+        tournament depths to show distinctly different profiles across multiple dimensions. The
+        radar charts below display six key metrics — effective field goal percentage, turnover
+        rate, offensive rebound rate, free throw rate, adjusted defensive efficiency, and adjusted
+        offensive efficiency — expressed as dataset-wide percentiles. Metrics where a lower raw
+        value is better (turnover rate, defensive efficiency) are inverted so that higher on every
+        axis always means better performance. The bold polygon shows the group median. The gray
+        dashed polygon shows the full D1-wide median, so you can immediately see how far above or
+        below average each group sits.
+      </p>
+      <p>
+        Use the buttons below to switch between postseason groups. Compare any group against the
+        D1-wide baseline (gray dashed) and observe how the profile shape changes as you move from
+        non-tournament teams through to champions. The overview tab shows champions and runners-up
+        side by side for direct comparison.
       </p>
 
-      <div class="viz-chart-wrap">
-        <img src="charts/viz2_radar.png"
-             alt="Radar charts comparing median performance profiles of NCAA champions and runner-up teams across six advanced metrics." />
-        <div class="viz-caption">
-          <h4>Takeaway</h4>
-          <p>
-            Champions and runners-up share broadly similar profiles: both groups sit well above the
-            dataset median on every metric, but champions show a consistently higher median on adjusted
-            offensive efficiency and effective field goal percentage. The most revealing difference is
-            defensive efficiency: champion teams cluster more tightly at the top of that axis, suggesting
-            that elite, consistent defense is a stronger differentiator between the two finalist groups
-            than any single offensive metric. The spread of individual faint lines for runners-up is also
-            noticeably wider, indicating that the path to the championship game is more varied while the
-            profile of a champion is more constrained.
-          </p>
+      <!-- Tab buttons -->
+      <div class="radar-tabs" id="radar-tabs">
+        <button class="radar-tab-btn active"
+                data-img="charts/viz2_radar_overview.png"
+                data-note="Side-by-side: NCAA Champions (n=11) vs. Runner-Up teams (n=11). This comparison reveals the fine margin separating the two finalist groups.">
+          Overview: Champs vs. 2ND
+        </button>
+        <button class="radar-tab-btn"
+                data-img="charts/viz2_radar_champions.png"
+                data-note="NCAA Champions — n = 11 team-seasons (one per tournament year, 2013–2024 excluding 2020).">
+          Champions
+        </button>
+        <button class="radar-tab-btn"
+                data-img="charts/viz2_radar_2nd.png"
+                data-note="Runner-Up teams (2ND) — n = 11 team-seasons. Profiles are broadly similar to champions but show slightly more spread.">
+          Runner-Up (2ND)
+        </button>
+        <button class="radar-tab-btn"
+                data-img="charts/viz2_radar_f4.png"
+                data-note="Final Four teams (F4) — n = 22 team-seasons. Elite across all dimensions; noticeable gap versus E8 teams.">
+          Final Four
+        </button>
+        <button class="radar-tab-btn"
+                data-img="charts/viz2_radar_e8.png"
+                data-note="Elite Eight teams (E8) — n = 44 team-seasons. Strong but slightly less extreme than F4 in most metrics.">
+          Elite Eight
+        </button>
+        <button class="radar-tab-btn"
+                data-img="charts/viz2_radar_s16.png"
+                data-note="Sweet 16 teams (S16) — n = 88 team-seasons. Clearly above the D1 median across all metrics, but more spread.">
+          Sweet 16
+        </button>
+        <button class="radar-tab-btn"
+                data-img="charts/viz2_radar_r32.png"
+                data-note="Round of 32 teams (R32) — n = 176 team-seasons. Modestly above the D1 median; first-round tournament entrants.">
+          Round of 32
+        </button>
+        <button class="radar-tab-btn"
+                data-img="charts/viz2_radar_notournament.png"
+                data-note="Non-tournament teams (No Tournament) — n = 3,137 team-seasons. Median polygon falls on or below the D1-wide baseline on every dimension.">
+          No Tournament
+        </button>
+      </div>
+
+      <div class="radar-img-wrap" id="radar-img-wrap">
+        <img id="radar-img"
+             src="charts/viz2_radar_overview.png"
+             alt="Radar chart showing performance profile of the selected postseason group." />
+        <div class="radar-group-note" id="radar-group-note">
+          Side-by-side: NCAA Champions (n=11) vs. Runner-Up teams (n=11). This comparison reveals the fine margin separating the two finalist groups.
         </div>
+      </div>
+
+      <div class="viz-caption" style="margin-top:1.2rem;border:1px solid var(--border);border-radius:8px;">
+        <h4>Takeaway</h4>
+        <p>
+          As you step through the groups from Champions down to No Tournament, the median polygon
+          steadily contracts toward and below the gray D1-wide baseline. Champions and runners-up
+          share broadly similar profiles — both well above average on every metric — but champions
+          show higher medians on adjusted offensive efficiency and defensive efficiency, and less
+          spread among individual teams. Non-tournament teams cluster at or below the baseline on
+          every axis. The most diagnostically useful comparison is defensive efficiency: the gap
+          between Final Four teams and Elite Eight teams on that single axis is larger than the gap
+          on any offensive metric, suggesting elite defense is the hardest capability to replicate
+          and the strongest differentiator among the very best programs.
+        </p>
       </div>
     </div>
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       VIZ 3 — Multi-faceted Scatter: WAB vs. Attributes
+       VIZ 3 — Multi-faceted Scatter: WAB vs. ADJOE, ADJDE, 2P_O
   ══════════════════════════════════════════════════════════════════════════ -->
   <section class="viz-section" id="viz3">
     <div class="container">
@@ -327,32 +392,37 @@
         <span class="viz-number">VIZ 03</span>
         <span class="section-label" style="margin:0">Static · Python / Matplotlib</span>
       </div>
-      <h2>Wins Above Bubble vs. Key Offensive and Efficiency Metrics</h2>
+      <h2>Wins Above Bubble vs. Offensive Efficiency, Defensive Efficiency, and Two-Point Shooting</h2>
       <hr class="divider" />
       <p>
         Wins Above Bubble (WAB) measures how many more wins a team accumulated than a hypothetical
-        bubble team would have facing the same schedule, making it a schedule-adjusted indicator
-        of how definitively a team established its tournament worthiness. The three scatter plots
-        below compare WAB against adjusted offensive efficiency, two-point field goal percentage,
-        and three-point field goal percentage. Points are colored by grouped tournament outcome,
-        and each panel includes a line of best fit (OLS) with the Pearson correlation coefficient (r).
+        bubble team would have on the same schedule — a schedule-adjusted indicator of how
+        definitively a team established its tournament worthiness. The three scatter plots below
+        compare WAB against adjusted offensive efficiency, adjusted defensive efficiency, and
+        two-point field goal percentage. Showing both efficiency metrics in the first two panels
+        sets up the two-axis efficiency space used in Visualization 4; the third panel narrows to
+        one shooting metric to test whether interior shooting quality carries additional explanatory
+        power. Points are colored by grouped tournament outcome (using the shared color scheme
+        defined in the data section), and each panel includes an OLS trend line with the Pearson
+        correlation coefficient.
       </p>
 
       <div class="viz-chart-wrap">
         <img src="charts/viz3_scatter_facet.png"
-             alt="Three scatter plots comparing Wins Above Bubble against ADJOE, 2P_O, and 3P_O, colored by postseason round group." />
+             alt="Three scatter plots comparing Wins Above Bubble against ADJOE, ADJDE, and 2P_O, colored by postseason round group." />
         <div class="viz-caption">
           <h4>Takeaway</h4>
           <p>
-            Adjusted offensive efficiency (ADJOE) has the strongest positive correlation with WAB of the
-            three metrics shown, confirming that pace- and opponent-adjusted scoring efficiency is a more
-            reliable driver of schedule-adjusted win accumulation than raw shooting percentages.
-            Two-point percentage shows a moderate positive relationship, while three-point percentage
-            has a weaker, noisier correlation with WAB. This is consistent with the well-documented high variance
-            of three-point shooting at the team level. Across all three panels, teams reaching the Elite
-            Eight or beyond (amber and gold points) cluster in the upper-right, while non-tournament teams
-            concentrate in the lower-left, reinforcing that WAB and offensive efficiency jointly discriminate
-            between tournament-caliber and below-average programs.
+            Adjusted offensive efficiency (ADJOE) has the strongest positive correlation with WAB of
+            the three metrics shown. Adjusted defensive efficiency (ADJDE) shows a notable negative
+            correlation — lower ADJDE means better defense and is associated with more wins above
+            the bubble — confirming that both dimensions of efficiency matter for schedule-adjusted
+            win accumulation, not just offense. Two-point percentage shows a positive but substantially
+            weaker correlation, indicating that shooting accuracy in the paint is relevant but secondary
+            to overall efficiency ratings. Across all three panels, teams reaching the Elite Eight or
+            beyond (amber through red) concentrate in the favorable region of each plot, while
+            non-tournament teams dominate the unfavorable region, reinforcing that WAB and advanced
+            efficiency metrics jointly discriminate between tournament-caliber and below-average programs.
           </p>
         </div>
       </div>
@@ -360,7 +430,7 @@
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       VIZ 4 — Altair: ADJOE vs. ADJDE Scatter (Interactive)
+       VIZ 4 — Altair: ADJOE vs. ADJDE (Interactive)
   ══════════════════════════════════════════════════════════════════════════ -->
   <section class="viz-section" id="viz4">
     <div class="container">
@@ -372,42 +442,43 @@
       <hr class="divider" />
       <p>
         Plotting adjusted offensive efficiency (ADJOE) on the horizontal axis against adjusted
-        defensive efficiency (ADJDE) on the vertical axis (with the vertical axis inverted so
-        that "up" always means better defense) creates a two-dimensional efficiency space.
+        defensive efficiency (ADJDE) on the vertical axis — with the vertical axis inverted so
+        that "up" always means better defense — creates a two-dimensional efficiency space.
         The upper-right quadrant contains teams with elite offense <em>and</em> elite defense;
         these are the programs most likely to make deep tournament runs. Point size encodes
-        BARTHAG, so the largest circles represent the highest-rated teams. Color encodes the
-        postseason round reached.
+        BARTHAG, so the largest circles represent the highest overall power ratings. Color
+        encodes postseason round using the shared scheme from the data section.
       </p>
       <p>
-        <strong>How to use this chart:</strong> Use the <em>Season</em> dropdown to filter by
-        a specific year or view all seasons at once. Click any round label in the legend to
-        isolate teams that reached that round; click again to reset.
-        Hover over any point to see the team name, conference, efficiency values, power rating,
-        and tournament result.
+        <strong>How to use this chart:</strong> Uncheck <em>Show all seasons</em> and then drag
+        the <em>Season</em> slider to step through individual years — watching the field of teams
+        shift from season to season is much more intuitive with a slider than with a dropdown.
+        Note that 2020 has no data (tournament canceled). Click any round label in the legend to
+        isolate teams that reached that round; click again to reset. Hover over any point for full
+        team details.
       </p>
 
       <div class="viz-interactive-wrap">
         <div id="viz4-chart"></div>
         <div class="viz-interaction-note">
           <strong>Interactions:</strong>
-          (1) Season dropdown — filter to a single year or all years.
+          (1) Season slider — uncheck "Show all seasons," then drag to step through individual years.
           (2) Legend click — highlight teams that reached a specific tournament round; all others fade.
-          (3) Hover tooltip — full team details on mouseover.
+          (3) Hover tooltip — team name, conference, season, both efficiency scores, power rating, and result.
         </div>
       </div>
 
       <div class="viz-caption" style="border:1px solid var(--border);border-radius:0 0 10px 10px;border-top:none;margin-top:0;">
         <h4>Takeaway</h4>
         <p>
-          Championship and Final Four teams occupy a clearly defined upper-right region of
-          efficiency space (high ADJOE combined with low ADJDE) and this separation becomes
-          visually obvious when the legend is used to isolate deep tournament runs. Non-tournament
-          teams, by contrast, scatter broadly and occupy the lower-left quadrant. The interactive
-          season filter reveals year-to-year variation: some seasons produce a denser cluster of
-          elite teams (e.g., 2015, 2019) while others are more diffuse, which in part explains
-          bracket unpredictability. Crucially, the two-dimensional efficiency position is a stronger
-          visual separator than any single metric would be in isolation.
+          Championship and Final Four teams occupy a clearly defined upper-right region of efficiency
+          space — high ADJOE combined with low ADJDE — and this separation becomes visually obvious
+          when the legend is used to isolate deep tournament runs. Non-tournament teams scatter broadly
+          and dominate the lower-left quadrant. Using the season slider reveals year-to-year variation:
+          some seasons produce a denser cluster of elite teams (e.g., 2015, 2019) while others are more
+          diffuse, which in part explains bracket unpredictability. The two-dimensional efficiency
+          position is a stronger visual separator of postseason outcomes than either metric would be
+          in isolation, which directly motivates the tier analysis in Visualization 5.
         </p>
       </div>
     </div>
@@ -426,18 +497,31 @@
       <hr class="divider" />
       <p>
         The preceding visualizations establish that elite teams look different in efficiency space.
-        This chart tests whether that difference translates systematically into better tournament
-        outcomes. All 3,885 team-seasons are divided into five equal-count quintile tiers based
-        on a selected efficiency metric (BARTHAG, ADJOE, or ADJDE), and for each tier the full
-        postseason distribution, what percentage of teams in that tier reached each round, is
-        shown as a stacked bar. If advanced metrics are genuinely predictive, Tier 5 should be
-        dominated by tournament teams and deep runs, while Tier 1 should be almost entirely
-        non-tournament programs.
+        This chart formalizes that relationship: do teams with stronger advanced metrics actually
+        reach deeper tournament rounds at meaningfully higher rates?
       </p>
+
+      <div class="card" style="margin-bottom:1.4rem;">
+        <h3 style="color:var(--text);font-family:var(--sans);font-size:0.9rem;font-weight:600;margin-bottom:0.5rem;">
+          How tiers are defined
+        </h3>
+        <p style="font-size:0.88rem;color:var(--muted);margin:0;line-height:1.7">
+          All 3,885 team-seasons are sorted by the selected efficiency metric and divided into five
+          equal-count groups called <strong style="color:var(--text)">quintile tiers</strong> — each
+          containing approximately 777 teams. Tier 1 is always the weakest quintile and Tier 5 is
+          always the strongest, regardless of which metric is selected. Because lower ADJDE indicates
+          better defense, the tier labels for ADJDE are reversed during assignment so that Tier 5 still
+          means "top 20% by defensive efficiency." The bars then show what percentage of teams within
+          each tier reached each postseason round — so if advanced metrics are genuinely predictive,
+          we expect Tier 5 to be heavily weighted toward tournament participants and deep runs, while
+          Tier 1 should be almost entirely non-tournament programs.
+        </p>
+      </div>
+
       <p>
         <strong>How to use this chart:</strong> Use the <em>Tier metric</em> dropdown to switch
-        between BARTHAG, offensive efficiency, and defensive efficiency quintile tiers.
-        Hover over any colored segment to see the exact count and percentage for that round
+        between BARTHAG, offensive efficiency (ADJOE), and defensive efficiency (ADJDE) quintile tiers.
+        Hover over any colored bar segment to see the exact count and percentage for that round
         within that tier. Click any segment to highlight that postseason round across all five
         tiers simultaneously; click the same segment again to deselect.
       </p>
@@ -446,25 +530,27 @@
         <div id="viz5-chart"></div>
         <div class="viz-interaction-note">
           <strong>Interactions:</strong>
-          (1) Metric dropdown — switch the tiering variable (BARTHAG / ADJOE / ADJDE).
-          (2) Hover tooltip — count and percentage per segment with tier total.
+          (1) Metric dropdown — switch the tiering variable between BARTHAG, ADJOE, and ADJDE.
+          (2) Hover tooltip — exact team count and percentage per segment, with tier total.
           (3) Click segment — highlights that postseason round across all tiers; click again to reset.
+          Also clickable via the legend row at the bottom.
         </div>
       </div>
 
       <div class="viz-caption" style="border:1px solid var(--border);border-radius:0 0 10px 10px;border-top:none;margin-top:0;">
         <h4>Takeaway</h4>
         <p>
-          The gradient is unambiguous across all three metric choices. Tier 5 teams (top quintile
-          by any efficiency metric) make up nearly all tournament participants at the deepest rounds,
-          while Tier 1 and Tier 2 teams are almost exclusively non-tournament programs. Switching
-          the metric reveals subtle differences: BARTHAG produces the sharpest tier separation,
-          consistent with its role as a composite power rating, while ADJDE (defensive efficiency)
-          shows a slightly steeper gradient toward elite rounds than ADJOE, suggesting that defensive
-          strength above a threshold is a more reliable predictor of reaching the Final Four and
-          beyond than offensive output at the same tier level. Together, these patterns provide
-          strong evidence that advanced efficiency metrics are meaningfully predictive of postseason
-          outcomes.
+          The gradient is unambiguous across all three metric choices. Tier 5 teams — the top 20%
+          by any efficiency metric — account for nearly all participants in the deepest tournament
+          rounds, while Tier 1 and Tier 2 teams are almost exclusively non-tournament programs.
+          Switching the metric reveals subtle but meaningful differences: BARTHAG produces the sharpest
+          tier separation overall, consistent with its role as a composite power rating. Comparing
+          ADJDE against ADJOE shows that defensive efficiency produces a slightly steeper gradient at
+          the top tiers — a larger share of Tier 5 ADJDE teams reach the Final Four and beyond than
+          the equivalent ADJOE tier, reinforcing the conclusion from Visualization 2 that elite defense
+          is the more reliable discriminator of championship-level outcomes. Together, these patterns
+          confirm that advanced efficiency metrics are systematically predictive of postseason depth,
+          not merely correlated with it.
         </p>
       </div>
     </div>
@@ -479,9 +565,10 @@
       <h2>What the Data Shows</h2>
       <hr class="divider" />
       <p>
-        Across five visualizations, advanced efficiency metrics, particularly the composite power rating BARTHAG and adjusted
-        defensive efficiency ADJDE, are strong systematic predictors of NCAA Tournament depth.
-        Three specific, actionable conclusions follow from this analysis.
+        Across five visualizations, a consistent and analytically coherent picture emerges.
+        Advanced efficiency metrics — particularly the composite power rating BARTHAG and adjusted
+        defensive efficiency — are strong systematic predictors of NCAA Tournament depth. Three
+        specific, actionable conclusions follow.
       </p>
 
       <div class="conclusion-grid">
@@ -489,21 +576,23 @@
           <span class="c-number">01</span>
           <h4>Defensive efficiency is a more reliable discriminator of championship outcomes than offensive efficiency.</h4>
           <p>
-            While both ADJOE and ADJDE separate tournament tiers, the radar chart profiles of champions
-            versus runners-up and the tier-distribution gradient in Viz 5 consistently show ADJDE
-            producing sharper stratification at the deepest rounds. Programs and analysts building
-            toward a championship run should weight defensive investment heavily, as elite offense
-            is more common among near-elite teams than elite defense is.
+            Both the radar profiles in Viz 2 and the tier distributions in Viz 5 show that ADJDE
+            produces sharper stratification at the deepest tournament rounds than ADJOE does.
+            The gap between Final Four teams and Elite Eight teams is wider on the defensive axis
+            than on any offensive metric. Programs building toward a championship run should
+            weight defensive investment heavily, as elite offense is more common among near-elite
+            teams than elite defense is.
           </p>
         </div>
         <div class="conclusion-card">
           <span class="c-number">02</span>
-          <h4>Raw shooting percentages (especially 3P%) are weak proxies for tournament potential compared to adjusted metrics.</h4>
+          <h4>Raw shooting percentages are weak proxies for tournament potential compared to adjusted efficiency metrics.</h4>
           <p>
-            The multi-faceted scatter in Viz 3 demonstrates that three-point percentage has a
-            noticeably weaker and noisier relationship with WAB than adjusted offensive efficiency does.
-            Recruiting strategies or in-season adjustments that prioritize shot quality and offensive
-            system efficiency, captured by ADJOE, over raw three-point volume are better aligned with
+            The WAB scatter in Viz 3 demonstrates that two-point percentage has a noticeably weaker
+            and noisier relationship with schedule-adjusted wins than adjusted offensive efficiency does.
+            Three-point percentage (not shown in Viz 3 but explored in preliminary analysis) is even
+            noisier. Recruiting strategies and in-season adjustments that prioritize system-level
+            efficiency — captured by ADJOE — over raw shooting percentages are better aligned with
             what actually predicts postseason success.
           </p>
         </div>
@@ -512,28 +601,28 @@
           <h4>The efficiency-to-outcomes relationship is systematic enough to improve bracket prediction over seed-based models.</h4>
           <p>
             Tier 5 BARTHAG teams reach the Sweet 16 or further at dramatically higher rates than
-            committee seeding alone would predict for mid-major programs. Future work extending this
-            analysis could build a logistic regression or gradient-boosted model using ADJOE, ADJDE,
-            and BARTHAG to generate head-to-head win probabilities, testing whether efficiency-first
-            brackets outperform seed-bracket baselines across the eleven seasons in this dataset.
+            committee seeding alone would predict for mid-major programs with equivalent records.
+            Future work could build a logistic regression or gradient-boosted model using ADJOE,
+            ADJDE, and BARTHAG to generate head-to-head win probabilities, testing whether
+            efficiency-first brackets outperform seed-bracket baselines across the eleven seasons
+            in this dataset.
           </p>
         </div>
       </div>
 
       <hr class="divider" />
-      <h3 class="future-title">
+      <h3 style="color:var(--muted);font-family:var(--sans);font-size:0.85rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.8rem;">
         Future Directions
       </h3>
       <p style="color:var(--muted);font-size:0.92rem;">
         Several extensions would strengthen these findings. First, incorporating game-level data
-        rather than season averages would allow analysis of whether teams that peak late (improving
-        ADJOE/ADJDE in conference tournament play) outperform their season-average tier in the NCAA
-        Tournament. Second, conference-level adjustment, comparing how a team's metrics compare
-        within their own conference, not just across the full dataset, could improve predictions
-        for mid-major programs that dominate weak conferences. Third, this analysis covers team-level
-        aggregates; player-level efficiency metrics (usage rate, true shooting percentage) would
-        allow examination of whether individual star quality provides tournament upside beyond what
-        team-level metrics capture.
+        rather than season averages would allow analysis of whether teams that peak late —
+        improving ADJOE/ADJDE during conference tournament play — outperform their season-average
+        tier in the NCAA Tournament. Second, conference-level adjustment (comparing a team's metrics
+        within their own conference rather than across all 350+ programs) could improve predictions
+        for mid-major programs that dominate weak conferences. Third, player-level efficiency metrics
+        (usage rate, true shooting percentage) would allow examination of whether individual star
+        quality provides tournament upside beyond what team-level metrics capture.
       </p>
     </div>
   </section>
@@ -542,41 +631,51 @@
   <footer>
     <div class="container">
       <p>
-        Kaggle Data: <a href="https://www.kaggle.com/datasets/andrewsundberg/college-basketball-dataset"
-                 target="_blank" rel="noopener">College Basketball Dataset</a>
+        Data: <a href="https://www.kaggle.com/datasets/andrewsundberg/college-basketball-dataset"
+                 target="_blank" rel="noopener">Kaggle — College Basketball Dataset</a>
         (originally from <a href="https://barttorvik.com" target="_blank" rel="noopener">barttorvik.com</a>).
+        Built with D3.js v7 and Altair / Vega-Lite.
       </p>
     </div>
   </footer>
 
-  <!-- ── Scripts ─────────────────────────────────────────────────────────────── -->
+  <!-- ── Viz 2: Radar tab switcher ─────────────────────────────────────────── -->
+  <script>
+    (function () {
+      const tabs    = document.querySelectorAll(".radar-tab-btn");
+      const img     = document.getElementById("radar-img");
+      const note    = document.getElementById("radar-group-note");
 
-  <!-- Viz 4: Altair chart rendered via Vega-Embed -->
+      tabs.forEach(btn => {
+        btn.addEventListener("click", () => {
+          tabs.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          img.src  = btn.dataset.img;
+          img.alt  = "Radar chart: " + btn.textContent.trim();
+          note.textContent = btn.dataset.note;
+        });
+      });
+    })();
+  </script>
+
+  <!-- ── Viz 4: Altair chart via Vega-Embed ─────────────────────────────────── -->
   <script>
     fetch("charts/viz4_altair.json")
       .then(res => {
-        if (!res.ok) throw new Error("Could not load viz4_altair.json");
+        if (!res.ok) throw new Error("Could not load viz4_altair.json — run generate_charts.py first.");
         return res.json();
       })
       .then(spec => {
-        // Remove Altair's top-level config so we can override via vegaEmbed
-        // (the spec already contains background and axis config from the Python export)
-        vegaEmbed("#viz4-chart", spec, {
-          actions: false,
-          renderer: "svg",
-        }).catch(console.error);
+        vegaEmbed("#viz4-chart", spec, { actions: false, renderer: "svg" })
+          .catch(console.error);
       })
       .catch(err => {
         document.getElementById("viz4-chart").innerHTML =
-          `<p style="color:var(--muted);padding:2rem;font-size:0.9rem;">
-             Chart could not be loaded. Run <code>python python/generate_charts.py</code>
-             and ensure <code>charts/viz4_altair.json</code> exists.
-             ${err.message}
-           </p>`;
+          `<p style="color:var(--muted);padding:2rem;font-size:0.9rem;">${err.message}</p>`;
       });
   </script>
 
-  <!-- Viz 5: D3 stacked bar chart -->
+  <!-- ── Viz 5: D3 stacked bar chart ──────────────────────────────────────── -->
   <script src="js/d3_viz.js"></script>
 
 </body>
