@@ -156,11 +156,9 @@ def viz1_boxplot(df: pd.DataFrame) -> None:
             marker="o", markerfacecolor=ACCENT, markeredgewidth=0,
             markersize=3.5, alpha=0.45
         ),
-        boxprops=dict(linewidth=1.2),
+        # Define uniform box style here
+        boxprops=dict(linewidth=1.2, facecolor="#4a5568", alpha=0.70, edgecolor=BORDER),
     )
-    for patch, conf in zip(bp["boxes"], conf_order):
-        patch.set_facecolor(CONF_COLORS.get(conf, "#4a5568"))
-        patch.set_alpha(0.70)
 
     # Median value annotations
     for i, conf in enumerate(conf_order, start=1):
@@ -188,18 +186,6 @@ def viz1_boxplot(df: pd.DataFrame) -> None:
     ax.set_axisbelow(True)
     for spine in ax.spines.values():
         spine.set_edgecolor(BORDER)
-
-    # Conference legend
-    patches = [
-        mpatches.Patch(facecolor=CONF_COLORS.get(c, "#4a5568"), alpha=0.7,
-                       edgecolor=BORDER, label=c)
-        for c in conf_order
-    ]
-    ax.legend(
-        handles=patches, ncol=7, loc="lower center",
-        bbox_to_anchor=(0.5, -0.18), frameon=True,
-        fontsize=9, title="Conference", title_fontsize=9
-    )
 
     fig.tight_layout()
     out = os.path.join(CHART_DIR, "viz1_boxplot.png")
